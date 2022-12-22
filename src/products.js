@@ -6,7 +6,8 @@ const writeFile = promisify(fs.writeFile);
 
 class ProductManager {
   constructor(path) {
-    this.path = [];
+    this.path = [],
+    this.loadProductsFromFile() //apenas se inicia el servidor, cargo los productos que ya están en el archivo
   }
 
   async getProducts(limit) {
@@ -20,23 +21,23 @@ class ProductManager {
 
   productId = () => {
     const count = this.path.length;
+    console.log(count)
     const nextId = count > 0 ? this.path[count - 1].id + 1 : 1;
-
+    console.log(nextId)
     return nextId;
   };
 
-  addProduct = async (title, description, price, thumbnail, stock) => {
+  addProduct = async (title, description, price, thumbnail, stock, category) => {
     //Unique code
     const code = `PRD-${this.productId()}`;
-  
+    console.log(code)
     // Check if code already exists
     const existingProduct = this.path.find(
       (product) => product.code === code
     );
     if (existingProduct) {
-      throw new Error('Product with this code already exists');
-    }
-  
+      return { success: false, product: null}
+    }  
     const id = this.productId();
     const product = {
       id,
@@ -45,11 +46,12 @@ class ProductManager {
       price,
       thumbnail,
       code,
-      stock: stock ?? 50,
-    };
-  
+      category,
+      stock: stock
+    }  
     this.path.push(product);
     await this.saveProductsToFile();
+    return { success: true, product: product } //estandarizar TODAS LAS RESPUESTAS DE LA CLASE
   }
 
   getProductById = (productId) => {

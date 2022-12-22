@@ -1,5 +1,5 @@
 import express from 'express';
-import productRouter from './src/routers/products.router.js';
+import router from './src/routers/index.router.js';
 
 const app = express();
 
@@ -10,7 +10,7 @@ app.use(express.json());
 app.use('/static', express.static('public'));
 
 // Mount the product router on the '/api/products' path
-app.use('/api/products', productRouter);
+app.use('/api', router);
 
 // Route for root path
 app.get('/', (req, res) => {
