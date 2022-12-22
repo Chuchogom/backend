@@ -1,8 +1,23 @@
-import { Router } from 'express';
-import ProductManager from '../products.js';
+import { Router } from 'express'
+import ProductManager from '../products.js'
 
 const router = Router();
-const productManager = new ProductManager();
+const productManager = new ProductManager()
+
+// POST / - add a new product
+router.post('/', async (req, res) => {
+  try {
+    const { title,description,price,stock,thumbnail,category } = req.body
+    const productAdded = await productManager.addProduct(title, description, price, thumbnail, stock, category);
+    console.log(productAdded)
+    //estandarizar TODAS LAS RESPUESTAS Y NO OLVIDAR LOS CODIGOS DE ESTADO
+    //agregar try/catch a las peticiones que faltan!
+    res.status(201).json({ message: 'Product added successfully', product: productAdded });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error adding product', error });
+  }
+})
 
 // GET / - get all products
 router.get('/', async (req, res) => {
@@ -18,18 +33,6 @@ router.get('/api/products/:id', async (req, res) => {
     res.status(404).json({ message: 'Product not found' });
   } else {
     res.json(product);
-  }
-});
-
-// POST / - add a new product
-router.post('/api/products', async (req, res) => {
-  try {
-    const product = req.body;
-    const productAdded = await productManager.addProduct(product);
-    res.json({ message: 'Product added successfully', product: productAdded });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Error adding product', error });
   }
 });
 
